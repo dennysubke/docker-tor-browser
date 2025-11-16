@@ -20,7 +20,7 @@ ENV TOR_GPG_KEY_ARM64="https://h-lindholm.net/pubkey"
 ENV TOR_FINGERPRINT_ARM64="0x24F141A3B988B6C350B937586AF15D1E45FDCEC9"
 
 # Generate Tor onion favicons
-ENV ONION_ICON_URL="https://raw.githubusercontent.com/DomiStyle/docker-tor-browser/master/icon.png"
+ENV ONION_ICON_URL="https://raw.githubusercontent.com/dennysubke/docker-tor-browser/master/icon.png"
 RUN install_app_icon.sh "${ONION_ICON_URL}"
 
 ARG DEBIAN_FRONTEND="noninteractive"
