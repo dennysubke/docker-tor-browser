@@ -65,19 +65,7 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
 FROM jlesage/baseimage-gui:ubuntu-22.04-v4
 
 ENV APP_NAME="Tor Browser"
-
 ENV show_output=1
-
-ARG DEBIAN_FRONTEND="noninteractive"
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends \
-    file \
-    libdbus-glib-1-2 \
-    libgtk-3-0 \
-    libx11-xcb1 \
-    libxt6 \
-    libasound2 \
-  && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app /app
 COPY --from=builder /opt/noVNC/app/images/icons/* /opt/noVNC/app/images/icons/
