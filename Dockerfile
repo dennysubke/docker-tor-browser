@@ -9,8 +9,8 @@ ENV TOR_VERSION_ARM64="15.0.17"
 ARG TARGETARCH
 
 # x64 Tor Browser official build
-ENV TOR_BINARY_X64="https://dist.torproject.org/torbrowser/${TOR_VERSION_X64}/tor-browser-linux-x86_64-${TOR_VERSION_X64}.tar.xz"
-ENV TOR_SIGNATURE_X64="https://dist.torproject.org/torbrowser/${TOR_VERSION_X64}/tor-browser-linux-x86_64-${TOR_VERSION_X64}.tar.xz.asc"
+ENV TOR_BINARY_X64="https://www.torproject.org/dist/torbrowser/${TOR_VERSION_X64}/tor-browser-linux-x86_64-${TOR_VERSION_X64}.tar.xz"
+ENV TOR_SIGNATURE_X64="https://www.torproject.org/dist/torbrowser/${TOR_VERSION_X64}/tor-browser-linux-x86_64-${TOR_VERSION_X64}.tar.xz.asc"
 ENV TOR_GPG_KEY_X64="https://openpgpkey.torproject.org/.well-known/openpgpkey/torproject.org/hu/kounek7zrdx745qydx6p59t9mqjpuhdf"
 ENV TOR_FINGERPRINT_X64="0xEF6E286DDA85EA2A4BA7DE684E2C6E8793298290"
 
@@ -35,10 +35,10 @@ WORKDIR /app
 
 RUN if [ "$TARGETARCH" = "amd64" ]; then \
       echo "Downloading official Tor Browser for amd64" && \
-      curl -fL -o "${TOR_BINARY_X64##*/}" "${TOR_BINARY_X64}" && \
-      curl -fL -o "${TOR_SIGNATURE_X64##*/}" "${TOR_SIGNATURE_X64}" && \
+      curl -4 --retry 8 --retry-delay 5 --retry-all-errors -fL -o "${TOR_BINARY_X64##*/}" "${TOR_BINARY_X64}" && \
+      curl -4 --retry 8 --retry-delay 5 --retry-all-errors -fL -o "${TOR_SIGNATURE_X64##*/}" "${TOR_SIGNATURE_X64}" && \
       echo "Verifying GPG signature for amd64" && \
-      curl -fsSL "${TOR_GPG_KEY_X64}" | gpg --import - && \
+      curl -4 --retry 8 --retry-delay 5 --retry-all-errors -fsSL "${TOR_GPG_KEY_X64}" | gpg --import - && \
       gpg --output ./tor.keyring --export "${TOR_FINGERPRINT_X64}" && \
       gpgv --keyring ./tor.keyring "${TOR_SIGNATURE_X64##*/}" "${TOR_BINARY_X64##*/}" && \
       du -sh "${TOR_BINARY_X64##*/}" "${TOR_SIGNATURE_X64##*/}" && \
@@ -48,7 +48,7 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
       rm "${TOR_BINARY_X64##*/}" "${TOR_SIGNATURE_X64##*/}" ./tor.keyring; \
     elif [ "$TARGETARCH" = "arm64" ]; then \
       echo "Downloading Tor Browser for arm64 from ooovlad community build" && \
-      curl -fL -o "${TOR_BINARY_ARM64##*/}" "${TOR_BINARY_ARM64}" && \
+      curl -4 --retry 8 --retry-delay 5 --retry-all-errors -fL -o "${TOR_BINARY_ARM64##*/}" "${TOR_BINARY_ARM64}" && \
       echo "WARNING: arm64 uses unofficial community build from ooovlad/tor-mullvad-aarch64" && \
       echo "Installing Tor Browser for arm64" && \
       tar --strip 1 -xvJf "${TOR_BINARY_ARM64##*/}" && \
