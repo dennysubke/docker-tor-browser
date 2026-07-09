@@ -6,7 +6,6 @@ ARG LOCALE="en-US"
 ENV TOR_VERSION_X64="15.0.17"
 ENV TOR_VERSION_ARM64="15.0.17"
 
-# automatic; passed in by Docker buildx
 ARG TARGETARCH
 
 # x64 Tor Browser official build
@@ -24,14 +23,13 @@ ENV ONION_ICON_URL="https://raw.githubusercontent.com/dennysubke/docker-tor-brow
 RUN install_app_icon.sh "${ONION_ICON_URL}"
 
 ARG DEBIAN_FRONTEND="noninteractive"
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends \
+
+RUN add-pkg \
     ca-certificates \
     curl \
     gnupg \
     gpg \
-    xz-utils \
-  && rm -rf /var/lib/apt/lists/*
+    xz-utils
 
 WORKDIR /app
 
@@ -61,11 +59,20 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
       exit 1; \
     fi
 
+
 ### Final image
 FROM jlesage/baseimage-gui:ubuntu-22.04-v4
 
 ENV APP_NAME="Tor Browser"
 ENV show_output=1
+
+RUN add-pkg \
+    file \
+    libdbus-glib-1-2 \
+    libgtk-3-0 \
+    libx11-xcb1 \
+    libxt6 \
+    libasound2
 
 COPY --from=builder /app /app
 COPY --from=builder /opt/noVNC/app/images/icons/* /opt/noVNC/app/images/icons/
@@ -73,6 +80,9 @@ COPY --from=builder /opt/noVNC/index.html /opt/noVNC/index.html
 
 COPY browser-cfg /browser-cfg
 COPY startapp.sh /startapp.sh
+
+RUN sed -i 's/\r$//' /startapp.sh \
+  && chmod +x /startapp.sh
 
 EXPOSE 5800
 EXPOSE 5900
